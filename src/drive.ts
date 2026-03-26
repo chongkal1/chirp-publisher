@@ -81,3 +81,12 @@ export async function listImagesInFolder(): Promise<DriveFile[]> {
     modifiedTime: f.modifiedTime,
   }));
 }
+
+/** Download an image as base64. */
+export async function downloadImageBase64(fileId: string): Promise<{ base64: string; mimeType: string }> {
+  const url = `${BASE}/files/${fileId}?alt=media`;
+  const res = await driveGet(url);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const mimeType = res.headers.get('content-type') || 'image/webp';
+  return { base64: buffer.toString('base64'), mimeType };
+}

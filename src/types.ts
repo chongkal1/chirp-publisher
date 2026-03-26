@@ -21,6 +21,8 @@ export interface ParsedArticle {
   categorySlug: string;
   authors: string[];
   coverUrl: string;
+  coverBase64?: string;
+  coverMimeType?: string;
   seoTitle: string | null;
   seoDescription: string | null;
   jsonLd: Record<string, unknown> | null;
@@ -35,6 +37,8 @@ export interface BlogApiPost {
   categorySlug: string;
   authors: string[];
   cover: string;
+  coverBase64?: string;
+  coverMimeType?: string;
   isFeatured: boolean;
   isDraft: boolean;
   seoTitle: string | null;

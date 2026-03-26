@@ -13,12 +13,14 @@ export async function publishPost(article: ParsedArticle): Promise<{ success: bo
     publishedAt: new Date().toISOString(),
     categorySlug: article.categorySlug,
     authors: article.authors,
-    cover: article.coverUrl,
+    cover: '',
+    coverBase64: article.coverBase64,
+    coverMimeType: article.coverMimeType,
     isFeatured: false,
     isDraft: false,
     seoTitle: article.seoTitle,
     seoDescription: article.seoDescription,
-    seoSocialImage: article.coverUrl || null,
+    seoSocialImage: null,
     seoNoIndex: false,
   };
 

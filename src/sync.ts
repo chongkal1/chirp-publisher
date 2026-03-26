@@ -1,4 +1,4 @@
-import { listDocsInFolder, exportDocAsHtml, listImagesInFolder } from './drive.js';
+import { listDocsInFolder, exportDocAsHtml, listImagesInFolder, downloadImageBase64 } from './drive.js';
 import { parseDocHtml } from './parser.js';
 import { publishPost } from './publisher.js';
 import { isPublished, markPublished } from './dedup.js';
@@ -39,6 +39,17 @@ export async function syncDriveToBlog(): Promise<{
 
         // Parse HTML into structured article
         const article = parseDocHtml(html, doc.name, images);
+
+        // Download cover image if matched
+        if (article.coverUrl) {
+          const imageId = article.coverUrl.match(/id=([^&]+)/)?.[1];
+          if (imageId) {
+            console.log(`[sync] Downloading cover image...`);
+            const { base64, mimeType } = await downloadImageBase64(imageId);
+            article.coverBase64 = base64;
+            article.coverMimeType = mimeType;
+          }
+        }
 
         // Publish to blog API
         const publishResult = await publishPost(article);
