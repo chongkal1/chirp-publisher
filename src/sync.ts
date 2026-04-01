@@ -3,6 +3,8 @@ import { parseDocHtml } from './parser.js';
 import { publishPost } from './publisher.js';
 import { isPublished, markPublished } from './dedup.js';
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 /** Main sync: fetch Drive docs, skip duplicates, publish new ones. */
 export async function syncDriveToBlog(): Promise<{
   checked: number;
@@ -50,6 +52,9 @@ export async function syncDriveToBlog(): Promise<{
             article.coverMimeType = mimeType;
           }
         }
+
+        // Pause between docs to avoid Google Drive rate-limiting
+        await delay(2000);
 
         // Publish to blog API
         const publishResult = await publishPost(article);
