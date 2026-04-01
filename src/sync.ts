@@ -89,6 +89,17 @@ export async function syncDriveToBlog(limit?: number): Promise<{
     result.errors.push(`Fatal: ${message}`);
   }
 
+  // Trigger page revalidation if we published anything
+  if (result.published > 0) {
+    try {
+      const revalidateUrl = process.env.REVALIDATE_URL || 'https://marketingsite-weld.vercel.app/api/blog/revalidate';
+      await fetch(revalidateUrl, { method: 'POST' });
+      console.log('[sync] Triggered blog page revalidation');
+    } catch (err) {
+      console.warn('[sync] Failed to trigger revalidation:', err);
+    }
+  }
+
   console.log(
     `[sync] Done. Checked: ${result.checked}, Published: ${result.published}, Skipped: ${result.skipped}, Errors: ${result.errors.length}`,
   );
