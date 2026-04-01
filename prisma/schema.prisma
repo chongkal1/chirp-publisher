@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Author {
+  id    String @id // e.g. "john-doe"
+  name  String
+  photo String
+
+  posts PostAuthor[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id    String @id @default(cuid())
+  title String
+  slug  String @unique
+
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  caption     String   @default("")
+  slug        String   @unique
+  cover         String   @default("")
+  coverData     Bytes?   // actual image binary
+  coverMimeType String?  // e.g. "image/webp"
+  isFeatured  Boolean  @default(false)
+  isDraft     Boolean  @default(false)
+  content     String // raw markdown/MDX
+  publishedAt DateTime
+
+  // SEO fields (1:1, stored flat)
+  seoTitle       String?
+  seoDescription String?
+  seoSocialImage String?
+  seoNoIndex     Boolean @default(false)
+
+  // Relations
+  categorySlug String
+  category     Category     @relation(fields: [categorySlug], references: [slug])
+  authors      PostAuthor[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categorySlug])
+  @@index([publishedAt(sort: Desc)])
+  @@index([isFeatured])
+  @@index([isDraft])
+}
+
+model PostAuthor {
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String
+  author   Author @relation(fields: [authorId], references: [id])
+  authorId String
+  order    Int    @default(0)
+
+  @@id([postId, authorId])
+}
