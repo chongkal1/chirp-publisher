@@ -43,9 +43,10 @@ app.post('/published/seed', (req, res) => {
   });
 });
 
-// Manual trigger
-app.post('/sync', async (_req, res) => {
-  const result = await syncDriveToBlog();
+// Manual trigger — optional ?limit=N to publish only N articles
+app.post('/sync', async (req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+  const result = await syncDriveToBlog(limit);
   res.json(result);
 });
 

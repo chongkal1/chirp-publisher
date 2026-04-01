@@ -6,7 +6,7 @@ import { isPublished, markPublished } from './dedup.js';
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /** Main sync: fetch Drive docs, skip duplicates, publish new ones. */
-export async function syncDriveToBlog(): Promise<{
+export async function syncDriveToBlog(limit?: number): Promise<{
   checked: number;
   published: number;
   skipped: number;
@@ -27,6 +27,12 @@ export async function syncDriveToBlog(): Promise<{
     result.checked = docs.length;
 
     for (const doc of docs) {
+      // Stop if we've hit the publish limit
+      if (limit && result.published >= limit) {
+        console.log(`[sync] Reached publish limit of ${limit}, stopping`);
+        break;
+      }
+
       // Anti-duplicate check
       if (isPublished(doc.id, doc.name)) {
         console.log(`[sync] Skipping (already published): "${doc.name}"`);
