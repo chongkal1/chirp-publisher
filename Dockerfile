@@ -9,11 +9,11 @@ RUN npm install
 COPY tsconfig.json ./
 COPY src/ ./src/
 
-RUN npm run build
+RUN npx prisma generate
 
 # Railway Volume mounts to /app/data
 RUN mkdir -p /app/data
 
 EXPOSE 3000
 
-CMD ["node", "dist/index.js"]
+CMD ["npx", "tsx", "src/index.ts"]
